@@ -1,14 +1,9 @@
 const defines = require('./../defines');
 const Fish = require('./fish');
+const ConfigManager = require('./../config/configManager');
+
 let _fishIndex = 1;
 
-const FISH_KINDS = [10101, 10201, 10301];
-
-const Seat = function () {
-    let that = {};
-
-    return that;
-};
 const Room = function (roomId, roomType) {
     let that = {};
     let _roomId = roomId;
@@ -16,19 +11,13 @@ const Room = function (roomId, roomType) {
     let _playerList = [];
     let _fishList = [];
     Object.defineProperty(that, 'roomId', {
-        get: function () {
-            return _roomId;
-        }
+        get: function () {return _roomId;}, enumerable: true,
     });
     Object.defineProperty(that, 'roomType', {
-        get: function () {
-            return _roomType;
-        }
+        get: function () {return _roomType;}, enumerable: true,
     });
     Object.defineProperty(that, 'players', {
-        get: function () {
-            return _playerList;
-        }
+        get: function () {return _playerList;}, enumerable: true,
     });
     that.joinPlayer = function (player, cb) {
         let seatId = 0;
@@ -113,7 +102,9 @@ const Room = function (roomId, roomType) {
         return _fishList;
     };
     const _createFish = function () {
-        const fishKind = FISH_KINDS[Math.floor(Math.random() * 3)];
+        const fishConfig = ConfigManager.getFishByRandom();
+        // console.log('fishConfig:' + JSON.stringify(fishConfig));
+        const fishKind = fishConfig.fid;
         let fish = Fish(_fishIndex++, fishKind);
         // console.log('新增鱼:' + fish.fid + ' - ' + fish.kind);
         _fishList.push(fish);

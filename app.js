@@ -4,6 +4,11 @@ const app = socket('3000');
 const config = require('./config');
 const mydb = require('./unit/db');
 mydb.connect(config.mysqlConfig);
+const ConfigManager = require('./config/configManager');
+ConfigManager.loadConfig();
+// let fish = ConfigManager.getFishConfig(10101);
+// let fish = ConfigManager.getFishByRandom();
+// console.log('fish = ' + JSON.stringify(fish));
 
 app.on('connection', function (socket) {
     console.log('a client connected');
