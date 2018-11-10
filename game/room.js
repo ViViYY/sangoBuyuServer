@@ -75,13 +75,13 @@ const Room = function (roomId, roomType) {
             }
         }
         if(playerIndex == -1){
-            cb('[room] player is not in room ');
+            if(cb) cb('[room] player is not in room ');
         } else {
-            console.log('[room:removePlayer] playerIndex :' + playerIndex);
-            console.log('[room:removePlayer] _playerList.length 1 :' + _playerList.length);
+            // console.log('[room:removePlayer] playerIndex :' + playerIndex);
+            // console.log('[room:removePlayer] _playerList.length 1 :' + _playerList.length);
             _playerList.splice(playerIndex, 1);
-            console.log('[room:removePlayer] _playerList.length 2 :' + _playerList.length);
-            cb(null, {});
+            // console.log('[room:removePlayer] _playerList.length 2 :' + _playerList.length);
+            if(cb) cb(null, {});
             //广播
             for(let i = 0; i < _playerList.length; i++){
                 let _player = _playerList[i];

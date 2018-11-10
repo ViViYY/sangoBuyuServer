@@ -139,7 +139,7 @@ const Player = function (socket, data) {
     that.forcedDisconnection = function () {
         console.log('player disconnected forced :' + _nickname);
         _socket.disconnect();
-        removePlayer(_uid);
+        removePlayer(that);
     };
     //其他玩家进入
     that.onPlayerJoin = function (_player) {
@@ -192,17 +192,25 @@ exports.getPlayer = function (uid) {
     }
     return null;
 };
-removePlayer = function (uid) {
+removePlayer = function (player) {
     let playerIndex;
     for(let i = 0; i < _playerList.length; i++){
-        let player = _playerList[i];
-        if(player && player.uid == uid){
+        let _player = _playerList[i];
+        if(_player && _player.uid === player.uid){
             playerIndex = i;
         }
     }
     if(!playerIndex){
         console.warn('removePlayer err: player is not exsit!!!');
     } else {
+        //room移除
+        if(player.roomId) {
+            let room = gameController.getRoom(player.roomId);
+            if(room){
+                room.removePlayer(player);
+            }
+        }
+        //list移除
         console.log("_playerList 1 = " + _playerList.length);
         _playerList.splice(playerIndex, 1);
         console.log("_playerList 2 = " + _playerList.length);
