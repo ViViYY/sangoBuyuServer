@@ -5,6 +5,13 @@ exports.connect = function (config) {
     client = mysql.createPool(config);
 };
 
+// exports.loadFishConfig = function (cb) {
+//     let sql = 'select * from t_config_fish;';
+//     query(sql, function (err, data) {
+//         cb(err, data);
+//     });
+// };
+
 exports.checkAccount = function (uid, password, cb) {
     let sql = 'select * from t_account where uid =  "' + uid + '";';
     query(sql, function (err, data) {
