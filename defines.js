@@ -6,6 +6,8 @@ defines.both = 'both';
 defines.roomPlayerNumberMax = 4;
 defines.roomNumberMax = 1;
 
+defines.cannonCost = 4;
+
 defines.roomType = {
     simple:1,
     hard:2,

@@ -41,20 +41,20 @@ exports.insertAccountInfo = function (data) {
     });
 };
 
-exports.updateAccountInfo = function (data) {
-    let sql = updateSql('t_account', data);
-    console.log('sql = ' + sql);
+exports.updateAccountInfo = function (uid, data) {
+    let sql = updateSql('t_account', 'uid', uid, data);
+    // console.log('sql = ' + sql);
     query(sql, function (err, res) {
         if(err){
             console.log(' updateAccountInfo err : ' + err);
         } else {
-            console.log(' updateAccountInfo res : ' + JSON.stringify(res));
+            // console.log(' updateAccountInfo res : ' + JSON.stringify(res));
         }
     });
 };
 
 const query = function (sql, cb) {
-    console.log('query = ' + sql);
+    // console.log('query = ' + sql);
     client.getConnection(function (err, connection) {
         if(err){
             console.log('connection mysql err :' + err);
@@ -99,16 +99,16 @@ const updateSql = function (table, mainKey, mainValue, data) {
     let sql = ' update  ' + table + ' set ';
     for(let i in data){
         if((typeof data[i]).indexOf('string') == 0){
-            sql += i + " = '" + data[i] + " ' ,";
+            sql += i + " = '" + data[i] + "' ,";
         } else {
-            sql += i + ' = ' + data[i] + " , ";
+            sql += i + ' = ' + data[i] + " ,";
         }
     }
     sql = sql.substring(0, sql.length - 1);
     if((typeof mainValue).indexOf('string') == 0){
-        sql = ' where ' + mainKey + " = '" + mainValue + " ' ";
+        sql += ' where ' + mainKey + " = '" + mainValue + "' ";
     } else {
-        sql = ' where ' + mainKey + ' = ' + mainValue;
+        sql += ' where ' + mainKey + ' = ' + mainValue;
     }
     return sql;
 };
