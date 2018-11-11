@@ -10,15 +10,20 @@ const Room = function (roomId, roomType) {
     let _roomType = roomType;
     let _playerList = [];
     let _fishList = [];
-    Object.defineProperty(that, 'roomId', {
-        get: function () {return _roomId;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'roomType', {
-        get: function () {return _roomType;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'players', {
-        get: function () {return _playerList;}, enumerable: true,
-    });
+
+    //getter and setter
+    {
+        Object.defineProperty(that, 'roomId', {
+            get: function () {return _roomId;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'roomType', {
+            get: function () {return _roomType;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'players', {
+            get: function () {return _playerList;}, enumerable: true,
+        });
+    }
+
     //初始化鱼群
     for(let i = 0; i < 10; i++){
         const fishConfig = ConfigManager.getFishByRandom();

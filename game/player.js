@@ -12,46 +12,82 @@ const Player = function (socket, data) {
     let _vip = data.vip;
     let _silver = data.silver;
     let _gold = data.gold;
-
     let _roomId = 0;
     let _seatId = 0;
 
-    const setDefineProperty = function (type, propertyName, propertyValue) {
-        switch (type) {
-            case defines.get :
-                Object.defineProperty(that, propertyName, {
-                    get:function () {return propertyValue;}
-                });
-                break;
-            case defines.set :
-                Object.defineProperty(that, propertyName, {
-                    set:function (value) {propertyValue = value;}
-                });
-                break;
-            case defines.both :
-                Object.defineProperty(that, propertyName, {
-                    get:function () {return propertyValue;},
-                    set:function (value) {propertyValue = value;}
-                });
-                break;
-            default:
-                break;
-        }
-    };
+    //getter ande setter
+    {
+        Object.defineProperty(that, 'uid', {
+            get: function () {
+                return _uid;
+            }, set: function (val) {
+                _uid = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'nickname', {
+            get: function () {
+                return _nickname;
+            }, set: function (val) {
+                _nickname = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'level', {
+            get: function () {
+                return _level;
+            }, set: function (val) {
+                _level = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'exp', {
+            get: function () {
+                return _exp;
+            }, set: function (val) {
+                _exp = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'vip', {
+            get: function () {
+                return _vip;
+            }, set: function (val) {
+                _vip = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'silver', {
+            get: function () {
+                return _silver;
+            }, set: function (val) {
+                _silver = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'gold', {
+            get: function () {
+                return _gold;
+            }, set: function (val) {
+                _gold = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'roomId', {
+            get: function () {
+                return _roomId;
+            }, set: function (val) {
+                _roomId = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'seatId', {
+            get: function () {
+                return _seatId;
+            }, set: function (val) {
+                _seatId = val;
+            }, enumerable: true,
+        });
+    }
+
+
     console.log('player: login：' + _nickname);
     const notify = function (msg, index, data, noLog) {
         if(!noLog)console.log(' server send player info : msg: ' + msg + ' , callbackIndex:' + index + " , data:" + JSON.stringify(data));
         _socket.emit('notify', {msg:msg, callbackIndex:index, data:data});
     };
-    setDefineProperty(defines.both, 'uid', _uid);
-    setDefineProperty(defines.both, 'nickname', _nickname);
-    setDefineProperty(defines.both, 'level', _level);
-    setDefineProperty(defines.both, 'exp', _exp);
-    setDefineProperty(defines.both, 'vip', _vip);
-    setDefineProperty(defines.both, 'silver', _silver);
-    setDefineProperty(defines.both, 'gold', _gold);
-    setDefineProperty(defines.both, 'roomId', _roomId);
-    setDefineProperty(defines.both, 'seatId', _seatId);
     notify('login', data.callbackIndex, {err: null, data: {
             uid: _uid,
             nickname: _nickname,
@@ -188,13 +224,15 @@ const Player = function (socket, data) {
     };
     //击杀鱼得奖励
     that.award = function (silver, gold, exp) {
-        _silver += silver;
+        that.silver += silver;
         _gold += gold;
         _exp += exp;
-        if(_level < 7 && _exp >= 1000){
-            _exp -= 1000;
+        console.log('_roomId = ' + _roomId);
+        let levelObj = defines.levelMap[_level];
+        let nextLevelObj = defines.levelMap[_level + 1];
+        if(nextLevelObj && _exp >= levelObj.needExp){
             _level ++;
-            let room = gameController.getRoom(that.roomId);
+            let room = gameController.getRoom(_roomId);
             if(room){
                 room.playerLevelUp(_uid, _level);
             }

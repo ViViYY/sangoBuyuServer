@@ -15,40 +15,42 @@ const Fish = function (fid, kind) {
     let _hp = _config.hp;
     let _killer = null;
 
-    Object.defineProperty(that, 'fid', {
-        get: function () {return _fid;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'kind', {
-        get: function () {return _kind;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'pathIndex', {
-        get: function () {return _pathIndex;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'step', {
-        get: function () {return _step;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'maxHp', {
-        get: function () {return _maxHp;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'hp', {
-        get: function () {return _hp;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'fishName', {
-        get: function () {return _config.fishName;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'silver', {
-        get: function () {return _config.silver;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'gold', {
-        get: function () {return _config.gold;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'exp', {
-        get: function () {return _config.exp;}, enumerable: true,
-    });
-    Object.defineProperty(that, 'killer', {
-        get: function () {return _killer;}, set: function (val) {_killer = val;}, enumerable: true,
-    });
-
+    //getter ande setter
+    {
+        Object.defineProperty(that, 'fid', {
+            get: function () {return _fid;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'kind', {
+            get: function () {return _kind;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'pathIndex', {
+            get: function () {return _pathIndex;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'step', {
+            get: function () {return _step;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'maxHp', {
+            get: function () {return _maxHp;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'hp', {
+            get: function () {return _hp;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'fishName', {
+            get: function () {return _config.fishName;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'silver', {
+            get: function () {return _config.silver;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'gold', {
+            get: function () {return _config.gold;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'exp', {
+            get: function () {return _config.exp;}, enumerable: true,
+        });
+        Object.defineProperty(that, 'killer', {
+            get: function () {return _killer;}, set: function (val) {_killer = val;}, enumerable: true,
+        });
+    }
 
     that.moveStep = function () {
         _step++;
