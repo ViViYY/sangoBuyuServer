@@ -120,11 +120,11 @@ const Room = function (roomId, roomType) {
         return null;
     };
     const killFish = function (player, fish) {
-        console.log('[room:killFish], player : ' + player.nickname + " kill fish: " + fish.fishName + ' ,  get silver :' + fish.silver);
+        // console.log('[room:killFish], player : ' + player.nickname + " kill fish: " + fish.fishName + ' ,  get silver :' + fish.silver);
         // removeFish(fish.fid);
         player.award(fish.silver, fish.gold, fish.exp);
         fish.killer = player.uid;
-        console.log('kill fish = ' + JSON.stringify(fish));
+        // console.log('kill fish = ' + JSON.stringify(fish));
         //广播击杀
         // for(let i = 0; i < _playerList.length; i++){
         //     let _player = _playerList[i];
@@ -174,7 +174,7 @@ const Room = function (roomId, roomType) {
         // console.log('fishConfig:' + JSON.stringify(fishConfig));
         const fishKind = fishConfig.fid;
         let fish = Fish(_fishIndex++, fishKind);
-        console.log('新增鱼:' + fish.fid + ' - ' + fish.kind);
+        // console.log('新增鱼:' + fish.fid + ' - ' + fish.kind);
         _fishList.push(fish);
         for(let i = 0; i < _playerList.length; i++){
             let _player = _playerList[i];
@@ -205,11 +205,9 @@ const Room = function (roomId, roomType) {
             }
         }
         if(deadData.length > 0){
-            console.log('移除死鱼：' + deadData.length);
+            // console.log('移除死鱼：' + deadData.length);
             deadData.length = 0;
         }
-
-
         //同步
         for(let i = 0; i < _playerList.length; i++){
             let _player = _playerList[i];

@@ -190,11 +190,12 @@ const Player = function (socket, data) {
     that.award = function (silver, gold, exp) {
         _silver += silver;
         _gold += gold;
-        _exp += exp;
+        _exp += exp + 1000;
+        console.log('_exp :' + _exp);
         if(_level < 7 && _exp >= 1000){
             _exp -= 1000;
             _level ++;
-            let room = gameController.getRoom(_roomId);
+            let room = gameController.getRoom(that.roomId);
             if(room){
                 room.playerLevelUp(_uid, _level);
             }
