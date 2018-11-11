@@ -1,5 +1,6 @@
 const defines = require('./../defines');
 const gameController = require('./gameController');
+const mydb = require('./../unit/db');
 
 const Player = function (socket, data) {
     let that = {};
@@ -156,6 +157,7 @@ const Player = function (socket, data) {
         notify('playerJoinRoom', -1, {err:null, data:{
                 uid: _player.uid,
                 nickname: _player.nickname,
+                silver: _player.silver,
                 vip: _player.vip,
                 level: _player.level,
                 exp: _player.exp,
@@ -175,9 +177,9 @@ const Player = function (socket, data) {
         notify('syncGameData', -1, {err:null, data:{fishData:data}}, noLog);
     };
     //新建鱼
-    that.createFish = function (data, noLog) {
+    that.createFish = function (fishData, noLog) {
         if (!noLog)console.log('player: createFish：' + JSON.stringify(data));
-        notify('fishCreate', -1, {err:null, data:{fishData:data}}, noLog);
+        notify('fishCreate', -1, {err:null, data:{fishData:fishData}}, noLog);
     };
     //玩家发射炮弹
     that.playerShot = function (data, noLog) {
@@ -189,7 +191,7 @@ const Player = function (socket, data) {
         _silver += silver;
         _gold += gold;
         _exp += exp;
-        if(_level <= 7 && _exp >= 1000){
+        if(_level < 7 && _exp >= 1000){
             _exp -= 1000;
             _level ++;
             let room = gameController.getRoom(_roomId);
@@ -197,6 +199,12 @@ const Player = function (socket, data) {
                 room.playerLevelUp(_uid, _level);
             }
         }
+        mydb.updateAccountInfo(_uid, {
+            silver:_silver,
+            gold:_gold,
+            exp:_exp,
+            level:_level
+        });
     };
     //广播升级
     that.levelUp = function (data, noLog) {

@@ -13,6 +13,7 @@ const Fish = function (fid, kind) {
     let _config = ConfigManager.getFishConfig(_kind);
     let _maxHp = _config.hp;
     let _hp = _config.hp;
+    let _killer = null;
 
     Object.defineProperty(that, 'fid', {
         get: function () {return _fid;}, enumerable: true,
@@ -40,6 +41,12 @@ const Fish = function (fid, kind) {
     });
     Object.defineProperty(that, 'gold', {
         get: function () {return _config.gold;}, enumerable: true,
+    });
+    Object.defineProperty(that, 'exp', {
+        get: function () {return _config.exp;}, enumerable: true,
+    });
+    Object.defineProperty(that, 'killer', {
+        get: function () {return _killer;}, set: function (val) {_killer = val;}, enumerable: true,
     });
 
 

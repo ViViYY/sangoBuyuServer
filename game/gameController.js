@@ -1,5 +1,6 @@
 const defines = require('./../defines');
 const Room = require('./room');
+const mydb = require('./../unit/db');
 let _roomSimpleList = [];
 let _roomHardList = [];
 let _roomIdIndex = 1;
@@ -115,6 +116,7 @@ exports.sendRoomDataToPlayer = function (player, cb) {
             playerList.push({
                 uid: _player.uid,
                 nickname: _player.nickname,
+                silver: _player.silver,
                 vip: _player.vip,
                 level: _player.level,
                 exp: _player.exp,
@@ -136,6 +138,16 @@ exports.sendRoomDataToPlayer = function (player, cb) {
 };
 
 exports.playerShot = function (shotter, rotation, cb) {
+    //silver是否足够
+    if(shotter.silver < defines.cannonCost){
+        cb('[gameController:playerShot]silver is not enough');
+        return;
+    }
+    shotter.silver -= defines.cannonCost;
+
+    mydb.updateAccountInfo(shotter.uid, {
+        silver:shotter.silver
+    });
     // console.log('player shot:' + shotter.nickname + '  : rotation' + rotation);
     let room = this.getRoom(shotter.roomId);
     if(!room){

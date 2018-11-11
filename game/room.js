@@ -120,17 +120,18 @@ const Room = function (roomId, roomType) {
         return null;
     };
     const killFish = function (player, fish) {
-        console.log('[room:hitFish], player : ' + player.nickname + " kill fish: " + fish.fishName + ' ,  get silver :' + fish.silver);
-        console.log('fish = ' + JSON.stringify(fish));
-        removeFish(fish.fid);
+        console.log('[room:killFish], player : ' + player.nickname + " kill fish: " + fish.fishName + ' ,  get silver :' + fish.silver);
+        // removeFish(fish.fid);
         player.award(fish.silver, fish.gold, fish.exp);
+        fish.killer = player.uid;
+        console.log('kill fish = ' + JSON.stringify(fish));
         //广播击杀
-        for(let i = 0; i < _playerList.length; i++){
-            let _player = _playerList[i];
-            if(_player){
-                _player.killFish({killer:player.uid, fid:fish.fid, silver:fish.silver, gold:fish.gold});
-            }
-        }
+        // for(let i = 0; i < _playerList.length; i++){
+        //     let _player = _playerList[i];
+        //     if(_player){
+        //         _player.killFish({killer:player.uid, fid:fish.fid, silver:fish.silver, gold:fish.gold});
+        //     }
+        // }
     };
     const removeFish = function (fid) {
         let index = -1;
@@ -173,7 +174,7 @@ const Room = function (roomId, roomType) {
         // console.log('fishConfig:' + JSON.stringify(fishConfig));
         const fishKind = fishConfig.fid;
         let fish = Fish(_fishIndex++, fishKind);
-        // console.log('新增鱼:' + fish.fid + ' - ' + fish.kind);
+        console.log('新增鱼:' + fish.fid + ' - ' + fish.kind);
         _fishList.push(fish);
         for(let i = 0; i < _playerList.length; i++){
             let _player = _playerList[i];
@@ -184,16 +185,36 @@ const Room = function (roomId, roomType) {
     };
     //帧同步定时器
     setInterval(function () {
-        let data = [];
+        let fishData = [];
+        let deadData = [];
         for(let i = 0; i < _fishList.length; i++){
             let fish = _fishList[i];
-            data.push({fid:fish.fid, kind:fish.kind, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp});
-            fish.moveStep();
+            if(!fish.isDead()){
+                fishData.push({fid:fish.fid, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp});
+                fish.moveStep();
+            } else {
+                deadData.push(fish);
+                fishData.push({fid:fish.fid, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp, killer:fish.killer, silver:fish.silver, gold:fish.gold});
+            }
         }
+        //移除死鱼
+        for(let i = 0; i < deadData.length; i++){
+            let fishDead = deadData[i];
+            if(fishDead){
+                removeFish(fishDead.fid);
+            }
+        }
+        if(deadData.length > 0){
+            console.log('移除死鱼：' + deadData.length);
+            deadData.length = 0;
+        }
+
+
+        //同步
         for(let i = 0; i < _playerList.length; i++){
             let _player = _playerList[i];
             if(_player){
-                _player.syncGameData(data, true);
+                _player.syncGameData(fishData, true);
             }
         }
         // console.log('rom: syncGameData：' + JSON.stringify(data));
