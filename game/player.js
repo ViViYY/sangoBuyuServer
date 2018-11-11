@@ -190,8 +190,7 @@ const Player = function (socket, data) {
     that.award = function (silver, gold, exp) {
         _silver += silver;
         _gold += gold;
-        _exp += exp + 1000;
-        console.log('_exp :' + _exp);
+        _exp += exp;
         if(_level < 7 && _exp >= 1000){
             _exp -= 1000;
             _level ++;
