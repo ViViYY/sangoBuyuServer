@@ -129,7 +129,7 @@ exports.sendRoomDataToPlayer = function (player, cb) {
     for(let i = 0; i < roomFishData.length; i++) {
         let _fish = roomFishData[i];
         if(_fish){
-            fishList.push({fid:_fish.fid, kind:_fish.kind, pathIndex:_fish.pathIndex, step:_fish.step});
+            fishList.push({fid:_fish.fid, kind:_fish.kind, pathIndex:_fish.pathIndex, step:_fish.step, hp:_fish.hp, maxHp:_fish.maxHp});
         }
     }
     cb(null, {playerList:playerList, fishList:fishList});
@@ -142,5 +142,13 @@ exports.playerShot = function (shotter, rotation, cb) {
         cb('[gameController:playerShot]room is not exsit : roomId:' + shotter.roomId);
     } else {
         room.playerShot(shotter, rotation, cb);
+    }
+};
+exports.hitFish = function (player, fid, cb) {
+    let room = this.getRoom(player.roomId);
+    if(!room){
+        cb('[gameController:hitFish]room is not exsit : roomId:' + player.roomId);
+    } else {
+        room.hitFish(player, fid, cb);
     }
 };

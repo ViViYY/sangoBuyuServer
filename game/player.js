@@ -73,7 +73,7 @@ const Player = function (socket, data) {
         let _msg = notifyData.msg;
         let _callbackIndex = notifyData.callbackIndex;
         let _data = notifyData.data;
-        if(_msg != 'player_shot') {
+        if(_msg != 'player_shot' && _msg != 'hit_fish') {
             console.log('#player nofity data# : ' + JSON.stringify(notifyData));
         }
         switch (_msg) {
@@ -131,6 +131,15 @@ const Player = function (socket, data) {
                     }
                 });
                 break;
+            case 'hit_fish':
+                gameController.hitFish(that, _data.fishId, function (err, data) {
+                    if(err){
+                        console.log('player: hit_fish + ' + _nickname  + ' err : ' + err);
+                    } else {
+                        console.log('player: hit_fish：' + _nickname);
+                    }
+                });
+                break;
             default:
                 break;
         }
@@ -174,6 +183,30 @@ const Player = function (socket, data) {
     that.playerShot = function (data, noLog) {
         if (!noLog)console.log('player: playerShot：' + JSON.stringify(data));
         notify('player_shot', -1, {err:null, data:data}, noLog);
+    };
+    //击杀鱼得奖励
+    that.award = function (silver, gold, exp) {
+        _silver += silver;
+        _gold += gold;
+        _exp += exp;
+        if(_level <= 7 && _exp >= 1000){
+            _exp -= 1000;
+            _level ++;
+            let room = gameController.getRoom(_roomId);
+            if(room){
+                room.playerLevelUp(_uid, _level);
+            }
+        }
+    };
+    //广播升级
+    that.levelUp = function (data, noLog) {
+        if (!noLog)console.log('player: levelUp：' + JSON.stringify(data));
+        notify('level_up', -1, {err:null, data:data}, noLog);
+    };
+    //广播击杀
+    that.killFish = function (data, noLog) {
+        if (!noLog)console.log('player: killFish：' + JSON.stringify(data));
+        notify('kill_fish', -1, {err:null, data:data}, noLog);
     };
 
     return that;

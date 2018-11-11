@@ -17,7 +17,7 @@ app.on('connection', function (socket) {
         let notifyData = res.data;
         let callbackIndex = res.callbackIndex;
         let msg = res.msg;
-        if(msg != 'player_shot'){
+        if(msg != 'player_shot' && msg != 'hit_fish'){
             console.log(' client nofity data : ' + JSON.stringify(res));
         }
         switch (msg) {
