@@ -23,4 +23,9 @@ defines.roomType = {
     hard:2,
 };
 
+
+defines.expMult = 1; //经验倍数
+defines.silverMult = 1; //银币倍数
+defines.goldMult = 1; //金币倍数
+
 module.exports = defines;

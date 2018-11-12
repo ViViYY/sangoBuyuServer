@@ -52,7 +52,7 @@ exports.getFishByRandom = function () {
 const loadCannonConfig = function () {
     for(let i = 0; i < t_cannon_config.length; i++){
         const config = t_cannon_config[i];
-        let cannon = CannonConfig(config.id, config.cid, config.level, config.power, config.s1, config.s2, config.s3);
+        let cannon = CannonConfig(config.id, config.cid, config.level, config.power, config.s1, config.s2, config.s3, config.speed);
         _cannonList[cannon.id] = cannon;
         _cannonCount++;
     }

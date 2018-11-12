@@ -224,10 +224,9 @@ const Player = function (socket, data) {
     };
     //击杀鱼得奖励
     that.award = function (silver, gold, exp) {
-        that.silver += silver;
-        _gold += gold;
-        _exp += exp;
-        console.log('_roomId = ' + _roomId);
+        that.silver += silver * defines.silverMult;
+        that.gold += gold * defines.goldMult;
+        that.exp += exp * defines.expMult;
         let levelObj = defines.levelMap[_level];
         let nextLevelObj = defines.levelMap[_level + 1];
         if(nextLevelObj && _exp >= levelObj.needExp){
