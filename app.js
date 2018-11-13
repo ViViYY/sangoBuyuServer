@@ -10,6 +10,14 @@ ConfigManager.loadConfig();
 // let fish = ConfigManager.getFishByRandom();
 // console.log('fish = ' + JSON.stringify(fish));
 
+// const fishPath = require('./fishPath');
+// for(let i = 0; i < 13; i++){
+//     let id = i + 1;
+//     let path = fishPath[id]
+//     console.log('path: ' + id + ' length = ' + path.length);
+// }
+
+
 app.on('connection', function (socket) {
     console.log('a client connected');
     socket.emit('welcome');

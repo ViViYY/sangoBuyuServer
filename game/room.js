@@ -182,7 +182,7 @@ const Room = function (roomId, roomType) {
     };
     const _createFish = function () {
         let fishNumber = _fishList.length;
-        if( fishNumber > defines.roomFishMax ){
+        if( fishNumber >= defines.roomFishMax ){
             return;
         }
         const fishConfig = ConfigManager.getFishByRandom();
@@ -230,7 +230,7 @@ const Room = function (roomId, roomType) {
                 _player.syncGameData(fishData, true);
             }
         }
-        // console.log('rom: syncGameData：' + JSON.stringify(data));
+        // console.log('rom: syncGameData：' + JSON.stringify(fishData));
     }, 50);
     //每5秒新增鱼
     setInterval(function () {
