@@ -22,7 +22,7 @@ exports.loadConfig = function () {
 const loadFishConfig = function () {
     for(let i = 0; i < t_fish_config.length; i++){
         const config = t_fish_config[i];
-        let fish = FishConfig(config.id, config.fid, config._name, config.hp, config.silver, config.gold, config.exp, config.speed, config.isBoss);
+        let fish = FishConfig(config.id, config.fid, config._name, config.hp, config.silver, config.gold, config.exp, config.speed, config.isBoss, config.deadSound);
         _fishList[fish.fid] = fish;
         _fishCount++;
     }

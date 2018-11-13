@@ -1,4 +1,4 @@
-const FishConfig = function (id, fid, name, hp, silver, gold, exp, speed, isBoss) {
+const FishConfig = function (id, fid, name, hp, silver, gold, exp, speed, isBoss, deadSound) {
     let that = {};
     let _id = id;
     let _fid = fid;
@@ -9,6 +9,7 @@ const FishConfig = function (id, fid, name, hp, silver, gold, exp, speed, isBoss
     let _exp = exp;
     let _speed = speed;
     let _isBoss = isBoss;
+    let _deadSound = deadSound;
 
     Object.defineProperty(that, 'id', {
         get: function () {return _id;}, enumerable: true,
