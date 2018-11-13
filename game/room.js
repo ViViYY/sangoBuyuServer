@@ -25,7 +25,7 @@ const Room = function (roomId, roomType) {
     }
 
     //初始化鱼群
-    for(let i = 0; i < 10; i++){
+    for(let i = 0; i < (defines.roomFishMax + defines.roomFishMin) / 2; i++){
         const fishConfig = ConfigManager.getFishByRandom();
         const fishKind = fishConfig.fid;
         let fish = Fish(_fishIndex++, fishKind);
@@ -129,6 +129,12 @@ const Room = function (roomId, roomType) {
         // removeFish(fish.fid);
         player.award(fish.silver, fish.gold, fish.exp);
         fish.killer = player.uid;
+        //补充
+        let fishNumber = _fishList.length;
+        if( fishNumber < defines.roomFishMin ){
+            _createFish();
+            return;
+        }
         // console.log('kill fish = ' + JSON.stringify(fish));
         //广播击杀
         // for(let i = 0; i < _playerList.length; i++){
@@ -157,7 +163,7 @@ const Room = function (roomId, roomType) {
         const cannonConfig = ConfigManager.getCannonConfigByLevel(player.level);
         let fish = getFish(fid);
         if(!fish){
-            console.warn('[room:hitFish] err, fish is not exist :' + fid);
+            //console.warn('[room:hitFish] err, fish is not exist :' + fid);
         } else {
             fish.beHit(cannonConfig.power);
             //是否击杀
@@ -175,6 +181,10 @@ const Room = function (roomId, roomType) {
         }
     };
     const _createFish = function () {
+        let fishNumber = _fishList.length;
+        if( fishNumber > defines.roomFishMax ){
+            return;
+        }
         const fishConfig = ConfigManager.getFishByRandom();
         // console.log('fishConfig:' + JSON.stringify(fishConfig));
         const fishKind = fishConfig.fid;
@@ -224,10 +234,7 @@ const Room = function (roomId, roomType) {
     }, 50);
     //每5秒新增鱼
     setInterval(function () {
-        let fishNumber = _fishList.length;
-        if( fishNumber < 10 ){
-            _createFish();
-        }
+        _createFish();
     }, 5000);
 
 

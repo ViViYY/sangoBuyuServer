@@ -1,12 +1,13 @@
 const fishPath = require('./../fishPath');
 const ConfigManager = require('./../config/configManager');
 const FishConfig = require('./../config/fishConfig');
+const defines = require('./../defines');
 
 const Fish = function (fid, kind) {
     let that = {};
     let _fid = fid;
     let _kind = kind;
-    let _pathIndex = Math.floor(Math.random() * 3 + 1);
+    let _pathIndex = Math.floor(Math.random() * defines.fishPathCount + 1);
     let _step = 0;
     let _pathPoints = fishPath[_pathIndex];
 
