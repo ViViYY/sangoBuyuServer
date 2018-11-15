@@ -180,6 +180,14 @@ const Room = function (roomId, roomType) {
             }
         }
     };
+    that.useSkill = function (player, skillId, cb) {
+        for(let i = 0; i < _fishList.length; i++){
+            let fish = _fishList[i];
+            if(fish && !fish.isDead()){
+                fish.iceTime = 5000;
+            }
+        }
+    };
     const _createFish = function () {
         let fishNumber = _fishList.length;
         if( fishNumber >= defines.roomFishMax ){
@@ -205,7 +213,14 @@ const Room = function (roomId, roomType) {
         for(let i = 0; i < _fishList.length; i++){
             let fish = _fishList[i];
             if(!fish.isDead()){
-                fishData.push({fid:fish.fid, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp});
+                if(fish.iceTime === 5000){
+                    fishData.push({fid:fish.fid, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp, ice:5000});
+                } else if(fish.iceTime === 0) {
+                    fishData.push({fid:fish.fid, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp, ice:0});
+                    fish.iceTime = -1;
+                } else {
+                    fishData.push({fid:fish.fid, pathIndex:fish.pathIndex, step:fish.step, hp:fish.hp, maxHp:fish.maxHp});
+                }
                 fish.moveStep();
             } else {
                 deadData.push(fish);

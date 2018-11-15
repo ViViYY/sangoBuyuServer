@@ -177,6 +177,15 @@ const Player = function (socket, data) {
                     }
                 });
                 break;
+            case 'use_skill':
+                gameController.useSkill(that, _data.skillId, function (err, data) {
+                    if(err){
+                        console.log('player: use_skill + ' + _nickname  + ' err : ' + err);
+                    } else {
+                        console.log('player: use_skill：' + _nickname + ' : ' + _data.skillId);
+                    }
+                })
+                break;
             default:
                 break;
         }

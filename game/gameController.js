@@ -131,7 +131,7 @@ exports.sendRoomDataToPlayer = function (player, cb) {
     for(let i = 0; i < roomFishData.length; i++) {
         let _fish = roomFishData[i];
         if(_fish){
-            fishList.push({fid:_fish.fid, kind:_fish.kind, pathIndex:_fish.pathIndex, step:_fish.step, hp:_fish.hp, maxHp:_fish.maxHp});
+            fishList.push({fid:_fish.fid, kind:_fish.kind, pathIndex:_fish.pathIndex, step:_fish.step, hp:_fish.hp, maxHp:_fish.maxHp, ice:_fish.iceTime});
         }
     }
     cb(null, {playerList:playerList, fishList:fishList});
@@ -162,5 +162,13 @@ exports.hitFish = function (player, fid, cb) {
         cb('[gameController:hitFish]room is not exsit : roomId:' + player.roomId);
     } else {
         room.hitFish(player, fid, cb);
+    }
+};
+exports.useSkill = function (player, skillId, cb) {
+    let room = this.getRoom(player.roomId);
+    if(!room){
+        cb('[gameController:hitFish]room is not exsit : roomId:' + player.roomId);
+    } else {
+        room.useSkill(player, skillId, cb);
     }
 };

@@ -16,6 +16,8 @@ const Fish = function (fid, kind) {
     let _hp = _config.hp;
     let _killer = null;
 
+    let _iceTime = -1;
+
     //getter ande setter
     {
         Object.defineProperty(that, 'fid', {
@@ -51,9 +53,17 @@ const Fish = function (fid, kind) {
         Object.defineProperty(that, 'killer', {
             get: function () {return _killer;}, set: function (val) {_killer = val;}, enumerable: true,
         });
+        Object.defineProperty(that, 'iceTime', {
+            get: function () {return _iceTime;}, set: function (val) {_iceTime = val;}, enumerable: true,
+        });
     }
 
     that.moveStep = function () {
+        if(_iceTime > 0){
+            _iceTime -= 50;
+            if(_iceTime < 0) _iceTime = 0;
+            return;
+        }
         _step++;
         if(_step >= _pathPoints.length){
             _step = 0;
