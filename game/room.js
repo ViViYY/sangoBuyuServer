@@ -94,12 +94,12 @@ const Room = function (roomId, roomType) {
             }
         }
     };
-    that.playerShot = function (shotter, rotation, cb) {
+    that.playerShot = function (shotter, rotation, targetFishId, cb) {
         // console.log('[room:playerShot]player shot:' + shotter.nickname + '  : rotation' + rotation);
         for(let i = 0; i < _playerList.length; i++){
             let _player = _playerList[i];
             if(_player && _player.uid != shotter.uid){
-                _player.playerShot({shotter:shotter.uid, rotation:rotation}, true);
+                _player.playerShot({shotter:shotter.uid, rotation:rotation, targetFishId:targetFishId}, true);
             }
         }
     };
@@ -181,12 +181,23 @@ const Room = function (roomId, roomType) {
         }
     };
     that.useSkill = function (player, skillId, cb) {
-        for(let i = 0; i < _fishList.length; i++){
-            let fish = _fishList[i];
-            if(fish && !fish.isDead()){
-                fish.iceTime = 5000;
-            }
+        switch (skillId) {
+            case 1001:
+                for(let i = 0; i < _fishList.length; i++){
+                    let fish = _fishList[i];
+                    if(fish && !fish.isDead()){
+                        fish.iceTime = 5000;
+                    }
+                }
+                break;
+            case 1002:
+
+                break;
+            default:
+                cb('技能不存在');
+                break;
         }
+        cb(null, {uid:player.uid, skillId:skillId});
     };
     const _createFish = function () {
         let fishNumber = _fishList.length;

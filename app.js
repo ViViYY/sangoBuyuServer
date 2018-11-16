@@ -17,7 +17,6 @@ ConfigManager.loadConfig();
 //     console.log('path: ' + id + ' length = ' + path.length);
 // }
 
-
 app.on('connection', function (socket) {
     console.log('a client connected');
     socket.emit('welcome');
@@ -41,14 +40,14 @@ app.on('connection', function (socket) {
                                 uid: notifyData.uid,
                                 password: notifyData.password,
                                 nickname: notifyData.uid,
-                                level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000
+                                level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000, s1:1001, s2:1002
                             });
                             //创建玩家
                             PlayerController.createPlayer(socket, {
                                 uid: notifyData.uid,
                                 nickname: notifyData.uid,
                                 callbackIndex: callbackIndex,
-                                level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000
+                                level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000, s1:1001, s2:1002
                             });
                         } else {
                             let accountData = data[0];
@@ -64,7 +63,13 @@ app.on('connection', function (socket) {
                                 uid: accountData.uid,
                                 nickname: accountData.nickname,
                                 callbackIndex: callbackIndex,
-                                level: accountData.level, exp: accountData.exp, vip: accountData.vip, silver: accountData.silver, gold: accountData.gold
+                                level: accountData.level,
+                                exp: accountData.exp,
+                                vip: accountData.vip,
+                                silver: accountData.silver,
+                                gold: accountData.gold,
+                                s1: accountData.s1,
+                                s2: accountData.s2
                             });
                         }
                     }

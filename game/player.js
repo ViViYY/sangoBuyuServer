@@ -1,6 +1,7 @@
 const defines = require('./../defines');
 const gameController = require('./gameController');
 const mydb = require('./../unit/db');
+const configManager = require('./../config/configManager');
 
 const Player = function (socket, data) {
     let that = {};
@@ -12,8 +13,13 @@ const Player = function (socket, data) {
     let _vip = data.vip;
     let _silver = data.silver;
     let _gold = data.gold;
+    let _s1 = data.s1;
+    let _s2 = data.s2;
+
     let _roomId = 0;
     let _seatId = 0;
+
+    let skillCdMap = {};
 
     //getter ande setter
     {
@@ -66,6 +72,20 @@ const Player = function (socket, data) {
                 _gold = val;
             }, enumerable: true,
         });
+        Object.defineProperty(that, 's1', {
+            get: function () {
+                return _s1;
+            }, set: function (val) {
+                _s1 = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 's2', {
+            get: function () {
+                return _s2;
+            }, set: function (val) {
+                _s2 = val;
+            }, enumerable: true,
+        });
         Object.defineProperty(that, 'roomId', {
             get: function () {
                 return _roomId;
@@ -95,7 +115,9 @@ const Player = function (socket, data) {
             exp: _exp,
             vip: _vip,
             silver: _silver,
-            gold: _gold
+            gold: _gold,
+            s1: _s1,
+            s2: _s2
         }
     });
     // notify('login', data.callbackIndex, {err: '不认识你'});
@@ -156,11 +178,11 @@ const Player = function (socket, data) {
                     } else {
                         console.log('player: ask_room_data：' + _nickname);
                     }
-                    notify('ask_room_data', _callbackIndex, {err:err, data:resData});
+                    notify('ask_room_data', _callbackIndex, {err:err, data:resData}, true);
                 });
                 break;
             case 'player_shot':
-                gameController.playerShot(that, _data.rotation, function (err, resData) {
+                gameController.playerShot(that, _data.rotation, _data.targetFishId, function (err, resData) {
                     if(err){
                         console.log('player: player_shot + ' + _nickname  + ' err : ' + err);
                     } else {
@@ -169,7 +191,7 @@ const Player = function (socket, data) {
                 });
                 break;
             case 'hit_fish':
-                gameController.hitFish(that, _data.fishId, function (err, data) {
+                gameController.hitFish(that, _data.fishId, function (err, resData) {
                     if(err){
                         console.log('player: hit_fish + ' + _nickname  + ' err : ' + err);
                     } else {
@@ -178,12 +200,23 @@ const Player = function (socket, data) {
                 });
                 break;
             case 'use_skill':
-                gameController.useSkill(that, _data.skillId, function (err, data) {
+                //cd检测
+                const timeStamp = Date.parse(new Date().toString());
+                if(skillCdMap[_data.skillId]){
+                    const skillConfig = configManager.getSkill(_data.skillId);
+                    if(timeStamp - skillCdMap[_data.skillId] < skillConfig.cd){
+                        notify('use_skill', _callbackIndex, {err:'技能cd未好,剩余时间：' + (skillConfig.cd - (timeStamp - skillCdMap[_data.skillId])) / 1000 + '秒'});
+                        return;
+                    }
+                }
+                skillCdMap[_data.skillId] = timeStamp;
+                gameController.useSkill(that, _data.skillId, function (err, resData) {
                     if(err){
                         console.log('player: use_skill + ' + _nickname  + ' err : ' + err);
                     } else {
                         console.log('player: use_skill：' + _nickname + ' : ' + _data.skillId);
                     }
+                    notify('use_skill', _callbackIndex, {err:err, data:resData});
                 })
                 break;
             default:

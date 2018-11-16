@@ -2,6 +2,8 @@ const t_fish_config = require('./../t_fish_config');
 const FishConfig = require('./fishConfig');
 const t_cannon_config = require('./../t_cannon_config');
 const CannonConfig = require('./cannonConfig');
+const t_skill_config = require('./../t_skill_config');
+const SkillConfig = require('./skillConfig');
 
 
 const TAG = '[ConfigManager]:';
@@ -9,12 +11,15 @@ let _fishList = {};
 let _fishCount = 0;
 let _cannonList = {};
 let _cannonCount = 0;
+let _skillList = {};
+let _skillCount = 0;
 
 //load all config
 exports.loadConfig = function () {
     console.log(TAG + ' load all config start --------------------------------------------- ');
     loadFishConfig();
     loadCannonConfig();
+    loadSkillConfig();
     console.log(TAG + ' load all config end --------------------------------------------- ');
 };
 
@@ -78,4 +83,21 @@ exports.getCannonConfigByLevel = function (level) {
         console.warn(TAG + 'getCannonConfigByLevel err, cannon is not exist, level = ' + level);
     }
     return cannon;
+};
+// -------------------------------------- skill config
+const loadSkillConfig = function () {
+    for(let i = 0; i < t_skill_config.length; i++){
+        const config = t_skill_config[i];
+        let skill = SkillConfig(config.id, config.active, config.cd, config.des, config.level, config.nextId, config.cost_silver, config.cost_gold, config.need_level, config.pro1, config.num1, config.pro2, config.num2, config.pro3, config.num3);
+        _skillList[skill.id] = skill;
+        _skillCount++;
+    }
+    console.log(TAG + ' skill count: ' + _skillCount);
+};
+exports.getSkill = function (sid) {
+    return _skillList[sid];
+};
+exports.getNextSkill = function (sid) {
+    const skill = _skillList[sid];
+    return _skillList[skill.nextId];
 };
