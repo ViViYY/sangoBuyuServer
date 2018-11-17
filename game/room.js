@@ -3,6 +3,7 @@ const Fish = require('./fish');
 const ConfigManager = require('./../config/configManager');
 
 let _fishIndex = 1;
+const _fishMaxLimit = {11101:1, 11001:3, 10901:5, 10701:8};
 
 const Room = function (roomId, roomType) {
     let that = {};
@@ -199,14 +200,33 @@ const Room = function (roomId, roomType) {
         }
         cb(null, {uid:player.uid, skillId:skillId});
     };
+    const getFishNumberOfKind = function (fishKind) {
+        let count = 0;
+        for(let i = 0; i < _fishList.length; i++){
+            let fish = _fishList[i];
+            if(!fish.isDead() && fish.kind === fishKind){
+                count++;
+            }
+        }
+        return count;
+    };
     const _createFish = function () {
         let fishNumber = _fishList.length;
         if( fishNumber >= defines.roomFishMax ){
             return;
         }
-        const fishConfig = ConfigManager.getFishByRandom();
+        let fishConfig = ConfigManager.getFishByRandom();
         // console.log('fishConfig:' + JSON.stringify(fishConfig));
-        const fishKind = fishConfig.fid;
+        let fishKind = fishConfig.fid;
+        let num = getFishNumberOfKind(fishKind);
+        let count = 0;
+        while(_fishMaxLimit[fishKind] && num > _fishMaxLimit[fishKind] && count < 50){
+            fishConfig = ConfigManager.getFishByRandom();
+            fishKind = fishConfig.fid;
+            num = getFishNumberOfKind(fishKind);
+            count++;
+        }
+
         let fish = Fish(_fishIndex++, fishKind);
         // console.log('新增鱼:' + fish.fid + ' - ' + fish.kind);
         _fishList.push(fish);
