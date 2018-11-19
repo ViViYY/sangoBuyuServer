@@ -17,6 +17,9 @@ ConfigManager.loadConfig();
 //     console.log('path: ' + id + ' length = ' + path.length);
 // }
 
+
+
+
 app.on('connection', function (socket) {
     console.log('a client connected');
     socket.emit('welcome');

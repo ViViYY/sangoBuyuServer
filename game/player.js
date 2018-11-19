@@ -3,7 +3,7 @@ const gameController = require('./gameController');
 const mydb = require('./../unit/db');
 const configManager = require('./../config/configManager');
 
-const Player = function (socket, data) {
+const Player = function (socket, data, isRobot) {
     let that = {};
     let _socket = socket;
     let _uid = data.uid;
@@ -16,8 +16,15 @@ const Player = function (socket, data) {
     let _s1 = data.s1;
     let _s2 = data.s2;
 
+    let _isRobot = isRobot;
+    let _playTime = Math.random() * 5 * 60 * 1000;
+    let _shotCD = 180;
+
     let _roomId = 0;
     let _seatId = 0;
+    let _targetFishId = 0;
+    let _targetFishRotation = 0;
+    let _skill1CD = 20 * 1000;
 
     let skillCdMap = {};
 
@@ -100,13 +107,55 @@ const Player = function (socket, data) {
                 _seatId = val;
             }, enumerable: true,
         });
+        Object.defineProperty(that, 'isRobot', {
+            get: function () {
+                return _isRobot;
+            }, set: function (val) {
+                _isRobot = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'playTime', {
+            get: function () {
+                return _playTime;
+            }, set: function (val) {
+                _playTime = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'shotCD', {
+            get: function () {
+                return _shotCD;
+            }, set: function (val) {
+                _shotCD = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'targetFishId', {
+            get: function () {
+                return _targetFishId;
+            }, set: function (val) {
+                _targetFishId = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'targetFishRotation', {
+            get: function () {
+                return _targetFishRotation;
+            }, set: function (val) {
+                _targetFishRotation = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'skill1CD', {
+            get: function () {
+                return _skill1CD;
+            }, set: function (val) {
+                _skill1CD = val;
+            }, enumerable: true,
+        });
     }
 
 
     console.log('player: login：' + _nickname);
     const notify = function (msg, index, data, noLog) {
         if(!noLog)console.log(' server send player info : msg: ' + msg + ' , callbackIndex:' + index + " , data:" + JSON.stringify(data));
-        _socket.emit('notify', {msg:msg, callbackIndex:index, data:data});
+        if(_socket && !isRobot) _socket.emit('notify', {msg:msg, callbackIndex:index, data:data});
     };
     notify('login', data.callbackIndex, {err: null, data: {
             uid: _uid,
@@ -122,107 +171,109 @@ const Player = function (socket, data) {
     });
     // notify('login', data.callbackIndex, {err: '不认识你'});
     console.log('create player modul');
-    _socket.on('disconnect', function () {
-        console.log(' player disconnect : ' + _nickname);
-        gameController.exitRoom(that, function (err, resData) {
+    if(_socket){
+        _socket.on('disconnect', function () {
+            console.log(' player disconnect : ' + _nickname);
+            gameController.exitRoom(that, function (err, resData) {
 
+            });
         });
-    });
-    _socket.on('notify', function (notifyData) {
-        let _msg = notifyData.msg;
-        let _callbackIndex = notifyData.callbackIndex;
-        let _data = notifyData.data;
-        if(_msg != 'player_shot' && _msg != 'hit_fish') {
-            console.log('#player nofity data# : ' + JSON.stringify(notifyData));
-        }
-        switch (_msg) {
-            case 'join_hall':
-                gameController.joinHall(that, function (err, resData) {
-                    if(err){
-                        console.log('player: join_hall + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: join_hall：' + _nickname);
+        _socket.on('notify', function (notifyData) {
+            let _msg = notifyData.msg;
+            let _callbackIndex = notifyData.callbackIndex;
+            let _data = notifyData.data;
+            if(_msg != 'player_shot' && _msg != 'hit_fish') {
+                console.log('#player nofity data# : ' + JSON.stringify(notifyData));
+            }
+            switch (_msg) {
+                case 'join_hall':
+                    gameController.joinHall(that, function (err, resData) {
+                        if(err){
+                            console.log('player: join_hall + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: join_hall：' + _nickname);
+                        }
+                        notify('join_hall', _callbackIndex, {err:err, data:resData});
+                    });
+                    break;
+                case 'join_room':
+                    gameController.joinRoom(0, that, _data.roomType, function (err, resData) {
+                        if(err){
+                            console.log('player: join_room + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: join_room：' + _nickname);
+                        }
+                        notify('join_room', _callbackIndex, {err:err, data:resData});
+                    });
+                    break;
+                case 'exit_room':
+                    gameController.exitRoom(that, function (err, resData) {
+                        if(err){
+                            console.log('player: exit_room + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: exit_room：' + _nickname);
+                        }
+                        console.log('[player] player leave room:' + _nickname);
+                        let playerNumberSimple = gameController.getSimpleRoomPlayerNumber();
+                        let playerNumberHard = gameController.getHardRoomPlayerNumber();
+                        resData.numSimple = playerNumberSimple;
+                        resData.numHard = playerNumberHard;
+                        notify('exit_room', _callbackIndex, {err:err, data:resData});
+                    });
+                    break;
+                case 'ask_room_data':
+                    gameController.sendRoomDataToPlayer(that, function (err, resData) {
+                        if(err){
+                            console.log('player: ask_room_data + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: ask_room_data：' + _nickname);
+                        }
+                        notify('ask_room_data', _callbackIndex, {err:err, data:resData}, true);
+                    });
+                    break;
+                case 'player_shot':
+                    gameController.playerShot(that, _data.rotation, _data.targetFishId, function (err, resData) {
+                        if(err){
+                            console.log('player: player_shot + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: player_shot：' + _nickname);
+                        }
+                    });
+                    break;
+                case 'hit_fish':
+                    gameController.hitFish(that, _data.uid, _data.fishId, function (err, resData) {
+                        if(err){
+                            console.log('player: hit_fish + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: hit_fish：' + _nickname);
+                        }
+                    });
+                    break;
+                case 'use_skill':
+                    //cd检测
+                    const timeStamp = Date.parse(new Date().toString());
+                    if(skillCdMap[_data.skillId]){
+                        const skillConfig = configManager.getSkill(_data.skillId);
+                        if(timeStamp - skillCdMap[_data.skillId] < skillConfig.cd){
+                            notify('use_skill', _callbackIndex, {err:'技能cd未好,剩余时间：' + (skillConfig.cd - (timeStamp - skillCdMap[_data.skillId])) / 1000 + '秒'});
+                            return;
+                        }
                     }
-                    notify('join_hall', _callbackIndex, {err:err, data:resData});
-                });
-                break;
-            case 'join_room':
-                gameController.joinRoom(0, that, _data.roomType, function (err, resData) {
-                    if(err){
-                        console.log('player: join_room + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: join_room：' + _nickname);
-                    }
-                    notify('join_room', _callbackIndex, {err:err, data:resData});
-                });
-                break;
-            case 'exit_room':
-                gameController.exitRoom(that, function (err, resData) {
-                    if(err){
-                        console.log('player: exit_room + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: exit_room：' + _nickname);
-                    }
-                    console.log('[player] player leave room:' + _nickname);
-                    let playerNumberSimple = gameController.getSimpleRoomPlayerNumber();
-                    let playerNumberHard = gameController.getHardRoomPlayerNumber();
-                    resData.numSimple = playerNumberSimple;
-                    resData.numHard = playerNumberHard;
-                    notify('exit_room', _callbackIndex, {err:err, data:resData});
-                });
-                break;
-            case 'ask_room_data':
-                gameController.sendRoomDataToPlayer(that, function (err, resData) {
-                    if(err){
-                        console.log('player: ask_room_data + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: ask_room_data：' + _nickname);
-                    }
-                    notify('ask_room_data', _callbackIndex, {err:err, data:resData}, true);
-                });
-                break;
-            case 'player_shot':
-                gameController.playerShot(that, _data.rotation, _data.targetFishId, function (err, resData) {
-                    if(err){
-                        console.log('player: player_shot + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: player_shot：' + _nickname);
-                    }
-                });
-                break;
-            case 'hit_fish':
-                gameController.hitFish(that, _data.fishId, function (err, resData) {
-                    if(err){
-                        console.log('player: hit_fish + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: hit_fish：' + _nickname);
-                    }
-                });
-                break;
-            case 'use_skill':
-                //cd检测
-                const timeStamp = Date.parse(new Date().toString());
-                if(skillCdMap[_data.skillId]){
-                    const skillConfig = configManager.getSkill(_data.skillId);
-                    if(timeStamp - skillCdMap[_data.skillId] < skillConfig.cd){
-                        notify('use_skill', _callbackIndex, {err:'技能cd未好,剩余时间：' + (skillConfig.cd - (timeStamp - skillCdMap[_data.skillId])) / 1000 + '秒'});
-                        return;
-                    }
-                }
-                skillCdMap[_data.skillId] = timeStamp;
-                gameController.useSkill(that, _data.skillId, function (err, resData) {
-                    if(err){
-                        console.log('player: use_skill + ' + _nickname  + ' err : ' + err);
-                    } else {
-                        console.log('player: use_skill：' + _nickname + ' : ' + _data.skillId);
-                    }
-                    notify('use_skill', _callbackIndex, {err:err, data:resData});
-                })
-                break;
-            default:
-                break;
-        }
-    });
+                    skillCdMap[_data.skillId] = timeStamp;
+                    gameController.useSkill(that, _data.skillId, function (err, resData) {
+                        if(err){
+                            console.log('player: use_skill + ' + _nickname  + ' err : ' + err);
+                        } else {
+                            console.log('player: use_skill：' + _nickname + ' : ' + _data.skillId);
+                        }
+                        notify('use_skill', _callbackIndex, {err:err, data:resData});
+                    })
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
     //强制断开连接
     that.forcedDisconnection = function () {
         console.log('player disconnected forced :' + _nickname);
@@ -239,7 +290,6 @@ const Player = function (socket, data) {
                 vip: _player.vip,
                 level: _player.level,
                 exp: _player.exp,
-                silver: _player.silver,
                 gold: _player.gold,
                 seatId:_player.seatId
             }});
@@ -278,12 +328,14 @@ const Player = function (socket, data) {
                 room.playerLevelUp(_uid, _level);
             }
         }
-        mydb.updateAccountInfo(_uid, {
-            silver:_silver,
-            gold:_gold,
-            exp:_exp,
-            level:_level
-        });
+        if(!that.isRobot){
+            mydb.updateAccountInfo(_uid, {
+                silver:_silver,
+                gold:_gold,
+                exp:_exp,
+                level:_level
+            });
+        }
     };
     //广播升级
     that.levelUp = function (data, noLog) {
@@ -296,12 +348,46 @@ const Player = function (socket, data) {
         notify('kill_fish', -1, {err:null, data:data}, noLog);
     };
 
+    //////////////////////////////////////////////////// robot
+    that.robotReset = function (fishList, fish) {
+        if(that.shotCD <= 0){
+            that.shotCD = 180;
+        }
+        let fishTarget = fish;
+        let fishPos;
+        if(fishTarget){
+            fishPos = fishTarget.getFishPosition();
+            if(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
+                fishTarget = null;
+            }
+        }
+        if(!fishTarget){
+            fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
+            fishPos = fishTarget.getFishPosition();
+            let count = 0;
+            while(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
+                fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
+                fishPos = fishTarget.getFishPosition();
+                count++;
+                if(count > 50){
+                    break;
+                }
+            }
+            that.targetFishId = fishTarget.fid;
+        }
+        let pos = [-300, -364];
+        that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
+    };
     return that;
 };
 let _playerList = [];
 exports.createPlayer = function (socket, data) {
-    let player = new Player(socket, data);
+    let player = new Player(socket, data, false);
     _playerList.push(player);
+};
+exports.createRobot = function (data) {
+    let robot = new Player(null, data, true);
+    return robot;
 };
 exports.getPlayer = function (uid) {
     for(let i = 0; i < _playerList.length; i++){

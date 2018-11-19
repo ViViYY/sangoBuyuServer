@@ -79,6 +79,10 @@ const Fish = function (fid, kind) {
     that.isDead = function () {
         return _hp === 0;
     };
+    that.getFishPosition = function () {
+        const data = _pathPoints[_step];
+        return [data[0], data[1]];
+    };
 
     return that;
 };

@@ -145,9 +145,12 @@ exports.playerShot = function (shotter, rotation, targetFishId, cb) {
     }
     shotter.silver -= defines.cannonCost;
 
-    mydb.updateAccountInfo(shotter.uid, {
-        silver:shotter.silver
-    });
+    if(!shotter.isRobot){
+        mydb.updateAccountInfo(shotter.uid, {
+            silver:shotter.silver
+        });
+    }
+
     // console.log('player shot:' + shotter.nickname + '  : rotation' + rotation);
     let room = this.getRoom(shotter.roomId);
     if(!room){
@@ -156,12 +159,12 @@ exports.playerShot = function (shotter, rotation, targetFishId, cb) {
         room.playerShot(shotter, rotation, targetFishId, cb);
     }
 };
-exports.hitFish = function (player, fid, cb) {
+exports.hitFish = function (player, bulletUId, fid, cb) {
     let room = this.getRoom(player.roomId);
     if(!room){
         cb('[gameController:hitFish]room is not exsit : roomId:' + player.roomId);
     } else {
-        room.hitFish(player, fid, cb);
+        room.hitFish(player, bulletUId, fid, cb);
     }
 };
 exports.useSkill = function (player, skillId, cb) {
