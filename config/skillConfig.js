@@ -1,7 +1,8 @@
-const SkillConfig = function (id, active, cd, des, level, nextId, cost_silver, cost_gold, need_level, pro1, num1, pro2, num2, pro3, num3) {
+const SkillConfig = function (id, name, active, cd, des, level, nextId, cost_silver, cost_gold, need_level, pro1, num1, pro2, num2, pro3, num3) {
     let that = {};
 
     let _id = id;
+    let _name = name;
     let _active = active;
     let _cd = cd;
     let _des = des;
@@ -19,6 +20,9 @@ const SkillConfig = function (id, active, cd, des, level, nextId, cost_silver, c
 
     Object.defineProperty(that, 'id', {
         get: function () {return _id;}, enumerable: true,
+    });
+    Object.defineProperty(that, 'name', {
+        get: function () {return _name;}, enumerable: true,
     });
     Object.defineProperty(that, 'active', {
         get: function () {return _active;}, enumerable: true,

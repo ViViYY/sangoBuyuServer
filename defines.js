@@ -1,4 +1,8 @@
 const defines = {};
+
+defines.initSilver = 10000;
+defines.initGold = 0;
+
 defines.get = 'get';
 defines.set = 'set';
 defines.both = 'both';

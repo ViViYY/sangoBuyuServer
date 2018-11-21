@@ -112,3 +112,25 @@ const updateSql = function (table, mainKey, mainValue, data) {
     }
     return sql;
 };
+
+
+
+/////////////////////////// robot
+exports.loadRobotData = function (cb) {
+    let sql = 'select * from t_robot;';
+    query(sql, function (err, data) {
+        if(cb) cb(data);
+    });
+};
+
+exports.updateRobotInfo = function (id, data) {
+    let sql = updateSql('t_robot', 'id', id, data);
+    query(sql, function (err, res) {
+        if(err){
+            console.log(' updateRobotInfo err : ' + err);
+        } else {
+            // console.log(' updateRobotInfo res : ' + JSON.stringify(res));
+        }
+    });
+};
+

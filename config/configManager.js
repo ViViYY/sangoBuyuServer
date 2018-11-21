@@ -88,7 +88,7 @@ exports.getCannonConfigByLevel = function (level) {
 const loadSkillConfig = function () {
     for(let i = 0; i < t_skill_config.length; i++){
         const config = t_skill_config[i];
-        let skill = SkillConfig(config.id, config.active, config.cd, config.des, config.level, config.nextId, config.cost_silver, config.cost_gold, config.need_level, config.pro1, config.num1, config.pro2, config.num2, config.pro3, config.num3);
+        let skill = SkillConfig(config.id, config.name, config.active, config.cd, config.des, config.level, config.nextId, config.cost_silver, config.cost_gold, config.need_level, config.pro1, config.num1, config.pro2, config.num2, config.pro3, config.num3);
         _skillList[skill.id] = skill;
         _skillCount++;
     }

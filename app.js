@@ -1,9 +1,14 @@
 const PlayerController = require('./game/player');
+const defines = require('./defines');
 const socket = require('socket.io');
 const app = socket('3000');
 const config = require('./config');
 const mydb = require('./unit/db');
 mydb.connect(config.mysqlConfig);
+const RobotManager = require('./config/robotManager');
+mydb.loadRobotData(function (data) {
+    RobotManager.initRobot(data);
+});
 const ConfigManager = require('./config/configManager');
 ConfigManager.loadConfig();
 // let fish = ConfigManager.getFishConfig(10101);
@@ -37,20 +42,20 @@ app.on('connection', function (socket) {
                         socket.emit('notify', {msg:msg, callbackIndex:callbackIndex, data:{err:err}});
                     } else {
                         //账户不存在
-                        if(data.length == 0){
+                        if(data.length === 0){
                             //创建
                             mydb.insertAccountInfo({
                                 uid: notifyData.uid,
                                 password: notifyData.password,
                                 nickname: notifyData.nickname,
-                                level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000, s1:1001, s2:1002
+                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:10101, s2:10201
                             });
                             //创建玩家
                             PlayerController.createPlayer(socket, {
                                 uid: notifyData.uid,
                                 nickname: notifyData.nickname,
                                 callbackIndex: callbackIndex,
-                                level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000, s1:1001, s2:1002
+                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:10101, s2:10201
                             });
                         } else {
                             let accountData = data[0];

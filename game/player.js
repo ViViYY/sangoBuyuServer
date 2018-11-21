@@ -12,6 +12,9 @@ const Player = function (socket, data, isRobot) {
     let _exp = data.exp;
     let _vip = data.vip;
     let _silver = data.silver;
+    if(isRobot && _silver < 6000){
+        _silver += 10000;
+    }
     let _gold = data.gold;
     let _s1 = data.s1;
     let _s2 = data.s2;
@@ -19,6 +22,7 @@ const Player = function (socket, data, isRobot) {
     let _isRobot = isRobot;
     let _playTime = Math.random() * 5 * 60 * 1000;
     let _shotCD = 180;
+    _playTime = 0;
 
     let _autoShot = false;
 
@@ -357,6 +361,13 @@ const Player = function (socket, data, isRobot) {
                 exp:_exp,
                 level:_level
             });
+        } else {
+            mydb.updateRobotInfo(that.robotId, {
+                silver:_silver,
+                gold:_gold,
+                exp:_exp,
+                level:_level
+            });
         }
     };
     //广播升级
@@ -383,27 +394,30 @@ const Player = function (socket, data, isRobot) {
         }
         let fishTarget = fish;
         let fishPos;
-        let dstep = 30;
         if(fishTarget){
-            fishPos = fishTarget.getFishPosition(dstep);
+            fishPos = fishTarget.getFishPosition(0);
             if(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
                 fishTarget = null;
             }
         }
         if(!fishTarget){
             fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
-            fishPos = fishTarget.getFishPosition(dstep);
+            fishPos = fishTarget.getFishPosition(0);
             let count = 0;
             while(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
                 fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
-                fishPos = fishTarget.getFishPosition(dstep);
+                fishPos = fishTarget.getFishPosition(0);
                 count++;
-                if(count > 50){
-                    break;
+                if(count > 10){
+                    that.targetFishId = 0;
+                    that.targetFishRotation = 0;
+                    return;
                 }
             }
             that.targetFishId = fishTarget.fid;
         }
+        let dstep = 30;
+        fishPos = fishTarget.getFishPosition(dstep);
         let pos = [-300, -364];
         switch (that.seatId) {
             case defines.seat.DownLeft:

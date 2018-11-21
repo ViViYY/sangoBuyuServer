@@ -149,6 +149,10 @@ exports.playerShot = function (shotter, rotation, targetFishId, cb) {
         mydb.updateAccountInfo(shotter.uid, {
             silver:shotter.silver
         });
+    } else {
+        mydb.updateRobotInfo(shotter.robotId, {
+            silver:shotter.silver
+        });
     }
     // console.log('player shot:' + shotter.nickname + '  : rotation' + rotation);
     let room = this.getRoom(shotter.roomId);
