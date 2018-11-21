@@ -16,6 +16,8 @@ const Fish = function (fid, kind) {
     let _hp = _config.hp;
     let _killer = null;
 
+    let _reverse = false;
+
     let _iceTime = -1;
 
     //getter ande setter
@@ -56,6 +58,9 @@ const Fish = function (fid, kind) {
         Object.defineProperty(that, 'iceTime', {
             get: function () {return _iceTime;}, set: function (val) {_iceTime = val;}, enumerable: true,
         });
+        Object.defineProperty(that, 'reverse', {
+            get: function () {return _reverse;}, set: function (val) {_reverse = val;}, enumerable: true,
+        });
     }
 
     that.moveStep = function () {
@@ -64,9 +69,17 @@ const Fish = function (fid, kind) {
             if(_iceTime < 0) _iceTime = 0;
             return;
         }
-        _step++;
-        if(_step >= _pathPoints.length){
+        if(!_reverse){
+            _step++;
+        } else {
+            _step--;
+        }
+        if(_step > _pathPoints.length - 1){
+            _step = _pathPoints.length - 1;
+            _reverse = true;
+        } else if(_step < 0){
             _step = 0;
+            _reverse = false;
         }
     };
     that.setStepByRandom = function () {
@@ -79,8 +92,20 @@ const Fish = function (fid, kind) {
     that.isDead = function () {
         return _hp === 0;
     };
-    that.getFishPosition = function () {
-        const data = _pathPoints[_step];
+    that.getFishPosition = function (dstep) {
+        let targetStep;
+        if(!that.reverse){
+            targetStep = _step + dstep;
+            if(targetStep > _pathPoints.length - 1){
+                targetStep = _pathPoints.length - 1;
+            }
+        } else {
+            targetStep = _step - dstep;
+            if(targetStep < 0){
+                targetStep = 0;
+            }
+        }
+        const data = _pathPoints[targetStep];
         return [data[0], data[1]];
     };
 

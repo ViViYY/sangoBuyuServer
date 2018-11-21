@@ -42,13 +42,13 @@ app.on('connection', function (socket) {
                             mydb.insertAccountInfo({
                                 uid: notifyData.uid,
                                 password: notifyData.password,
-                                nickname: notifyData.uid,
+                                nickname: notifyData.nickname,
                                 level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000, s1:1001, s2:1002
                             });
                             //创建玩家
                             PlayerController.createPlayer(socket, {
                                 uid: notifyData.uid,
-                                nickname: notifyData.uid,
+                                nickname: notifyData.nickname,
                                 callbackIndex: callbackIndex,
                                 level: 1, exp: 0, vip: 0, silver: 100000, gold: 100000, s1:1001, s2:1002
                             });

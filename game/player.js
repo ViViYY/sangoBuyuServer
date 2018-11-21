@@ -20,6 +20,8 @@ const Player = function (socket, data, isRobot) {
     let _playTime = Math.random() * 5 * 60 * 1000;
     let _shotCD = 180;
 
+    let _autoShot = false;
+
     let _roomId = 0;
     let _seatId = 0;
     let _targetFishId = 0;
@@ -149,6 +151,13 @@ const Player = function (socket, data, isRobot) {
                 _skill1CD = val;
             }, enumerable: true,
         });
+        Object.defineProperty(that, 'autoShot', {
+            get: function () {
+                return _autoShot;
+            }, set: function (val) {
+                _autoShot = val;
+            }, enumerable: true,
+        });
     }
 
 
@@ -232,6 +241,7 @@ const Player = function (socket, data, isRobot) {
                     });
                     break;
                 case 'player_shot':
+                    that.autoShot = false;
                     gameController.playerShot(that, _data.rotation, _data.targetFishId, function (err, resData) {
                         if(err){
                             console.log('player: player_shot + ' + _nickname  + ' err : ' + err);
@@ -269,6 +279,18 @@ const Player = function (socket, data, isRobot) {
                         notify('use_skill', _callbackIndex, {err:err, data:resData});
                     })
                     break;
+                case 'auto_shot':
+                    if(_data.auto === 1){
+                        if(!that.autoShot){
+                            that.autoShot = true;
+                            notify('setAutoShot', -1, {err:null, auto:1});
+                        }
+                    } else {
+                        if(that.autoShot){
+                            that.autoShot = false;
+                            notify('setAutoShot', -1, {err:null, auto:2});
+                        }
+                    }
                 default:
                     break;
             }
@@ -350,24 +372,31 @@ const Player = function (socket, data, isRobot) {
 
     //////////////////////////////////////////////////// robot
     that.robotReset = function (fishList, fish) {
+        //鱼群没有鱼
+        if(fishList.length === 0){
+            that.targetFishId = 0;
+            that.targetFishRotation = 0;
+            return;
+        }
         if(that.shotCD <= 0){
             that.shotCD = 180;
         }
         let fishTarget = fish;
         let fishPos;
+        let dstep = 30;
         if(fishTarget){
-            fishPos = fishTarget.getFishPosition();
+            fishPos = fishTarget.getFishPosition(dstep);
             if(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
                 fishTarget = null;
             }
         }
         if(!fishTarget){
             fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
-            fishPos = fishTarget.getFishPosition();
+            fishPos = fishTarget.getFishPosition(dstep);
             let count = 0;
             while(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
                 fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
-                fishPos = fishTarget.getFishPosition();
+                fishPos = fishTarget.getFishPosition(dstep);
                 count++;
                 if(count > 50){
                     break;
@@ -376,7 +405,29 @@ const Player = function (socket, data, isRobot) {
             that.targetFishId = fishTarget.fid;
         }
         let pos = [-300, -364];
-        that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
+        switch (that.seatId) {
+            case defines.seat.DownLeft:
+                pos = [-300, -364];
+                that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
+                break;
+            case defines.seat.DownRight:
+                pos = [300, -364];
+                that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
+                that.targetFishRotation = -that.targetFishRotation;
+                break;
+            case defines.seat.UpLeft:
+                pos = [-300, 364];
+                that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
+                that.targetFishRotation = -that.targetFishRotation - 180;
+                break;
+            case defines.seat.UpRight:
+                pos = [300, 364];
+                that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
+                that.targetFishRotation = that.targetFishRotation + 180;
+                break;
+            default:
+                break;
+        }
     };
     return that;
 };

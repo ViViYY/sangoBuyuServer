@@ -150,7 +150,6 @@ exports.playerShot = function (shotter, rotation, targetFishId, cb) {
             silver:shotter.silver
         });
     }
-
     // console.log('player shot:' + shotter.nickname + '  : rotation' + rotation);
     let room = this.getRoom(shotter.roomId);
     if(!room){
