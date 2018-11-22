@@ -80,9 +80,9 @@ exports.joinRoom = function (roomId, player, roomType, cb) {
     if(!roomTarget){
         //新建房间
         roomTarget = Room(_roomIdIndex++, roomType);
-        if(roomType == defines.roomType.simple){
+        if(roomType === defines.roomType.simple){
             _roomSimpleList.push(roomTarget);
-        } else if(roomType == defines.roomType.hard){
+        } else if(roomType === defines.roomType.hard){
             _roomHardList.push(roomTarget);
         }
     }
@@ -111,11 +111,12 @@ exports.sendRoomDataToPlayer = function (player, cb) {
     let roomPlayerList = room.getPlayerList();
     for(let i = 0; i < roomPlayerList.length; i++){
         let _player = roomPlayerList[i];
-        // console.log('_player: ' + _player.nickname);
+        console.log('_player: ' + JSON.stringify(_player));
         if(_player){
             playerList.push({
                 uid: _player.uid,
                 nickname: _player.nickname,
+                avatarUrl: _player.avatarUrl,
                 silver: _player.silver,
                 vip: _player.vip,
                 level: _player.level,

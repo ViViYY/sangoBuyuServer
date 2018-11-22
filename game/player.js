@@ -8,6 +8,7 @@ const Player = function (socket, data, isRobot) {
     let _socket = socket;
     let _uid = data.uid;
     let _nickname = data.nickname;
+    let _avatarUrl = data.avatarUrl;
     let _level = data.level;
     let _exp = data.exp;
     let _vip = data.vip;
@@ -22,7 +23,6 @@ const Player = function (socket, data, isRobot) {
     let _isRobot = isRobot;
     let _playTime = Math.random() * 5 * 60 * 1000;
     let _shotCD = 180;
-    _playTime = 0;
 
     let _autoShot = false;
 
@@ -48,6 +48,13 @@ const Player = function (socket, data, isRobot) {
                 return _nickname;
             }, set: function (val) {
                 _nickname = val;
+            }, enumerable: true,
+        });
+        Object.defineProperty(that, 'avatarUrl', {
+            get: function () {
+                return _avatarUrl;
+            }, set: function (val) {
+                _avatarUrl = val;
             }, enumerable: true,
         });
         Object.defineProperty(that, 'level', {
@@ -173,6 +180,7 @@ const Player = function (socket, data, isRobot) {
     notify('login', data.callbackIndex, {err: null, data: {
             uid: _uid,
             nickname: _nickname,
+            avatarUrl: _avatarUrl,
             level: _level,
             exp: _exp,
             vip: _vip,
@@ -312,6 +320,7 @@ const Player = function (socket, data, isRobot) {
         notify('playerJoinRoom', -1, {err:null, data:{
                 uid: _player.uid,
                 nickname: _player.nickname,
+                avatarUrl: _player.avatarUrl,
                 silver: _player.silver,
                 vip: _player.vip,
                 level: _player.level,
@@ -396,7 +405,7 @@ const Player = function (socket, data, isRobot) {
         let fishPos;
         if(fishTarget){
             fishPos = fishTarget.getFishPosition(0);
-            if(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
+            if(fishPos[0] < -defines.windowWidth / 2 || fishPos[0] > defines.windowWidth / 2 || fishPos[1] < -defines.windowHeight / 2 || fishPos[1] > defines.windowHeight / 2){
                 fishTarget = null;
             }
         }
@@ -404,7 +413,7 @@ const Player = function (socket, data, isRobot) {
             fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
             fishPos = fishTarget.getFishPosition(0);
             let count = 0;
-            while(fishPos[0] < -512 || fishPos[0] > 512 || fishPos[1] < -384 || fishPos[1] > 384){
+            while(fishPos[0] < -defines.windowWidth / 2 || fishPos[0] > defines.windowWidth / 2 || fishPos[1] < -defines.windowWidth / 2 || fishPos[1] > defines.windowWidth / 2){
                 fishTarget = fishList[Math.floor(Math.random() * (fishList.length - 1))];
                 fishPos = fishTarget.getFishPosition(0);
                 count++;
@@ -416,26 +425,30 @@ const Player = function (socket, data, isRobot) {
             }
             that.targetFishId = fishTarget.fid;
         }
-        let dstep = 30;
-        fishPos = fishTarget.getFishPosition(dstep);
-        let pos = [-300, -364];
+        let forwardStep = 30;
+        //冰冻状态
+        if(fishTarget.iceTime > 0){
+            forwardStep = 0;
+        }
+        fishPos = fishTarget.getFishPosition(forwardStep);
+        let pos = [-defines.cannonDxToCenter, -defines.windowHeight / 2];
         switch (that.seatId) {
             case defines.seat.DownLeft:
-                pos = [-300, -364];
+                pos = [-defines.cannonDxToCenter, -defines.windowHeight / 2];
                 that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
                 break;
             case defines.seat.DownRight:
-                pos = [300, -364];
+                pos = [defines.cannonDxToCenter, -defines.windowHeight / 2];
                 that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
                 that.targetFishRotation = -that.targetFishRotation;
                 break;
             case defines.seat.UpLeft:
-                pos = [-300, 364];
+                pos = [-defines.cannonDxToCenter, defines.windowHeight / 2];
                 that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
                 that.targetFishRotation = -that.targetFishRotation - 180;
                 break;
             case defines.seat.UpRight:
-                pos = [300, 364];
+                pos = [defines.cannonDxToCenter, defines.windowHeight / 2];
                 that.targetFishRotation = Math.atan2(fishPos[1] - pos[1], pos[0] - fishPos[0]) * 180 / Math.PI - 90;
                 that.targetFishRotation = that.targetFishRotation + 180;
                 break;
@@ -457,7 +470,7 @@ exports.createRobot = function (data) {
 exports.getPlayer = function (uid) {
     for(let i = 0; i < _playerList.length; i++){
         let player = _playerList[i];
-        if(player && player.uid == uid){
+        if(player && player.uid === uid){
             return player;
         }
     }

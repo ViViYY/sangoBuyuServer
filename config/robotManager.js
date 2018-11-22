@@ -58,7 +58,7 @@ exports.getRobotIdByRandom = function () {
     let copyList = _robotList.slice(0);
 
     while(copyList.length > 1){
-        let rand = 1 + Math.floor(Math.random() * copyList.length - 1);
+        let rand = 1 + Math.floor(Math.random() * (copyList.length - 1));
         if(_robotTakeOut[rand]){
             copyList.splice(rand, 1);
             continue;

@@ -48,14 +48,15 @@ app.on('connection', function (socket) {
                                 uid: notifyData.uid,
                                 password: notifyData.password,
                                 nickname: notifyData.nickname,
-                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:10101, s2:10201
+                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:defines.skillIce, s2:defines.skillTarget
                             });
                             //创建玩家
                             PlayerController.createPlayer(socket, {
                                 uid: notifyData.uid,
                                 nickname: notifyData.nickname,
+                                avatarUrl: notifyData.avatarUrl,
                                 callbackIndex: callbackIndex,
-                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:10101, s2:10201
+                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:defines.skillIce, s2:defines.skillTarget
                             });
                         } else {
                             let accountData = data[0];
@@ -70,6 +71,7 @@ app.on('connection', function (socket) {
                             PlayerController.createPlayer(socket, {
                                 uid: accountData.uid,
                                 nickname: accountData.nickname,
+                                avatarUrl: accountData.avatarUrl,
                                 callbackIndex: callbackIndex,
                                 level: accountData.level,
                                 exp: accountData.exp,
