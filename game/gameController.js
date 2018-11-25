@@ -71,7 +71,7 @@ exports.getEmptyRoom = function (roomType) {
     return roomTarget;
 };
 exports.joinRoom = function (roomId, player, roomType, cb) {
-    let roomTarget = this.getRoom(roomId);
+    let roomTarget;
     if(0 === roomId){
         roomTarget = this.getEmptyRoom(roomType);
     } else {
