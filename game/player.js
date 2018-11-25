@@ -195,9 +195,7 @@ const Player = function (socket, data, isRobot) {
     if(_socket){
         _socket.on('disconnect', function () {
             console.log(' player disconnect : ' + _nickname);
-            gameController.exitRoom(that, function (err, resData) {
-
-            });
+            removePlayer(that);
         });
         _socket.on('notify', function (notifyData) {
             let _msg = notifyData.msg;
@@ -310,6 +308,7 @@ const Player = function (socket, data, isRobot) {
     }
     //强制断开连接
     that.forcedDisconnection = function () {
+        notify('message', -1, {msg:'账号在别处登陆'}, true);
         console.log('player disconnected forced :' + _nickname);
         _socket.disconnect();
         removePlayer(that);
@@ -477,18 +476,19 @@ exports.getPlayer = function (uid) {
     return null;
 };
 removePlayer = function (player) {
-    let playerIndex;
+    let playerIndex = -1;
     for(let i = 0; i < _playerList.length; i++){
         let _player = _playerList[i];
         if(_player && _player.uid === player.uid){
             playerIndex = i;
         }
     }
-    if(!playerIndex){
+    if(playerIndex < 0){
         console.warn('removePlayer err: player is not exsit!!!');
     } else {
         //room移除
         if(player.roomId) {
+            console.log('[player]:disconnect, and remove from room ,roomId:' + player.roomId);
             let room = gameController.getRoom(player.roomId);
             if(room){
                 room.removePlayer(player);

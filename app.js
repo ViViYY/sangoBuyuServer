@@ -64,7 +64,7 @@ app.on('connection', function (socket) {
                             let player = PlayerController.getPlayer(accountData.uid);
                             if(player){
                                 //踢掉
-                                console.log('重复登陆，强制踢出');
+                                console.log('重复登陆，强制踢出:');
                                 player.forcedDisconnection();
                             }
                             //创建玩家
