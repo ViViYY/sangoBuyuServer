@@ -26,7 +26,7 @@ ConfigManager.loadConfig();
 
 
 app.on('connection', function (socket) {
-    console.log('a client connected');
+    // console.log('a client connected');
     socket.emit('welcome');
     socket.on('notify', function (res) {
         let notifyData = res.data;
@@ -43,20 +43,23 @@ app.on('connection', function (socket) {
                     } else {
                         //账户不存在
                         if(data.length === 0){
+                            console.log('notifyData = ' + JSON.stringify(notifyData));
                             //创建
                             mydb.insertAccountInfo({
                                 uid: notifyData.uid,
                                 password: notifyData.password,
                                 nickname: notifyData.nickname,
-                                level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:defines.skillIce, s2:defines.skillTarget
-                            });
-                            //创建玩家
-                            PlayerController.createPlayer(socket, {
-                                uid: notifyData.uid,
-                                nickname: notifyData.nickname,
                                 avatarUrl: notifyData.avatarUrl,
-                                callbackIndex: callbackIndex,
                                 level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:defines.skillIce, s2:defines.skillTarget
+                            }, () => {
+                                //创建玩家
+                                PlayerController.createPlayer(socket, {
+                                    uid: notifyData.uid,
+                                    nickname: notifyData.nickname,
+                                    avatarUrl: notifyData.avatarUrl,
+                                    callbackIndex: callbackIndex,
+                                    level: 1, exp: 0, vip: 0, silver: defines.initSilver, gold: defines.initGold, s1:defines.skillIce, s2:defines.skillTarget
+                                });
                             });
                         } else {
                             let accountData = data[0];

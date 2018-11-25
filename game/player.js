@@ -495,8 +495,8 @@ removePlayer = function (player) {
             }
         }
         //list移除
-        console.log("_playerList 1 = " + _playerList.length);
+        // console.log("_playerList 1 = " + _playerList.length);
         _playerList.splice(playerIndex, 1);
-        console.log("_playerList 2 = " + _playerList.length);
+        // console.log("_playerList 2 = " + _playerList.length);
     }
 };

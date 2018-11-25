@@ -17,7 +17,7 @@ defines.roomNumberMax = 1;
 defines.cannonCost = 4;
 defines.fishPathCount = 18;
 defines.roomFishMin = 15;
-defines.roomFishMax = 40;
+defines.roomFishMax = 45;
 
 defines.levelMap = {
     1: {"needExp":1000}, // 1500

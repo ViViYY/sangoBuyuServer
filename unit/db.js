@@ -29,14 +29,25 @@ exports.checkAccount = function (uid, password, cb) {
     });
 };
 
-exports.insertAccountInfo = function (data) {
+exports.insertAccountInfo = function (data, cb) {
     let sql = insertSql('t_account', data);
     console.log('sql = ' + sql);
-    query(sql, function (err, res) {
+    let sql2 = 'SET NAMES utf8mb4;';
+    query(sql2, function (err, res) {
         if(err){
-            console.log(' insertAccountInfo err : ' + err);
+            console.log(' insertAccountInfo sql2 err : ' + err);
         } else {
-            console.log(' insertAccountInfo res : ' + JSON.stringify(res));
+            console.log(' insertAccountInfo sql2 res : ' + JSON.stringify(res));
+            query(sql, function (err, res) {
+                if(err){
+                    console.log(' insertAccountInfo err : ' + err);
+                } else {
+                    console.log(' insertAccountInfo res : ' + JSON.stringify(res));
+                    if(cb){
+                        cb();
+                    }
+                }
+            });
         }
     });
 };
