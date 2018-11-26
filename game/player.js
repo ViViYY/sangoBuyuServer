@@ -290,15 +290,34 @@ const Player = function (socket, data, isRobot) {
                     })
                     break;
                 case 'auto_shot':
-                    if(_data.auto === 1){
-                        if(!that.autoShot){
-                            that.autoShot = true;
-                            notify('setAutoShot', -1, {err:null, auto:1});
+                    //金币是否是足够
+                    if(that.silver >= defines.cannonCost){
+                        if(_data.auto === 1){
+                            if(!that.autoShot){
+                                that.autoShot = true;
+                                notify('setAutoShot', -1, {err:null, auto:1});
+                            }
+                        } else {
+                            if(that.autoShot){
+                                that.autoShot = false;
+                                notify('setAutoShot', -1, {err:null, auto:2});
+                            }
                         }
-                    } else {
-                        if(that.autoShot){
-                            that.autoShot = false;
-                            notify('setAutoShot', -1, {err:null, auto:2});
+                    }
+                case 'share_coin':
+                    if(_data.type === 1){
+                        that.award(1000, 0, 0);
+                        notify('use_skill', _callbackIndex, {err:null, data:{type:1, silver:that.silver}});
+                        let room = gameController.getRoom(_roomId);
+                        if(room){
+                            room.playerSilverRefresh(that);
+                        }
+                    } else if(_data.type === 2){
+                        that.award(3000, 0, 0);
+                        notify('use_skill', _callbackIndex, {err:null, data:{type:2, silver:that.silver}});
+                        let room = gameController.getRoom(_roomId);
+                        if(room){
+                            room.playerSilverRefresh(that);
                         }
                     }
                 default:
@@ -306,6 +325,11 @@ const Player = function (socket, data, isRobot) {
             }
         });
     }
+    //停止自动攻击
+    that.stopAutoShot = function () {
+        that.autoShot = false;
+        notify('setAutoShot', -1, {err:null, auto:2});
+    };
     //强制断开连接
     that.forcedDisconnection = function () {
         notify('message', -1, {msg:'账号在别处登陆'}, true);
@@ -388,7 +412,11 @@ const Player = function (socket, data, isRobot) {
         if (!noLog)console.log('player: killFish：' + JSON.stringify(data));
         notify('kill_fish', -1, {err:null, data:data}, noLog);
     };
-
+    //金币刷新
+    that.silverRefesh = function (data, noLog) {
+        if (!noLog)console.log('player: silverRefesh：' + JSON.stringify(data));
+        notify('silver_refresh', -1, {err:null, data:data}, noLog);
+    };
     //////////////////////////////////////////////////// robot
     that.robotReset = function (fishList, fish) {
         //鱼群没有鱼

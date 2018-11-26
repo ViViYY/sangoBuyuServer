@@ -141,7 +141,7 @@ exports.sendRoomDataToPlayer = function (player, cb) {
 exports.playerShot = function (shotter, rotation, targetFishId, cb) {
     //silver是否足够
     if(shotter.silver < defines.cannonCost){
-        cb('[gameController:playerShot]silver is not enough');
+        if(cb) cb('[gameController:playerShot]silver is not enough');
         return;
     }
     shotter.silver -= defines.cannonCost;
@@ -160,7 +160,7 @@ exports.playerShot = function (shotter, rotation, targetFishId, cb) {
     if(!room){
         cb('[gameController:playerShot]room is not exsit : roomId:' + shotter.roomId);
     } else {
-        room.playerShot(shotter, rotation, targetFishId, cb);
+        room.playerShot(shotter, rotation, shotter.silver, targetFishId, cb);
     }
 };
 exports.hitFish = function (player, bulletUId, fid, cb) {

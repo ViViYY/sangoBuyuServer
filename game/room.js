@@ -165,14 +165,19 @@ const Room = function (roomId, roomType) {
                     if(_player && !_player.isRobot){
                         // 发射炮弹
                         if(_player.autoShot){
-                            _player.shotCD -= timeStep;
-                            if(_player.shotCD <= 0){
-                                _player.robotReset(_fishList, getFish(_player.targetFishId));
-                                // 没有目标
-                                if(_player.targetFishId === 0){
+                            // 金币是否足够
+                            if(_player.silver < defines.cannonCost){
+                                _player.stopAutoShot();
+                            } else {
+                                _player.shotCD -= timeStep;
+                                if(_player.shotCD <= 0){
+                                    _player.robotReset(_fishList, getFish(_player.targetFishId));
+                                    // 没有目标
+                                    if(_player.targetFishId === 0){
 
-                                } else {
-                                    gameController.playerShot(_player, _player.targetFishRotation, 0);
+                                    } else {
+                                        gameController.playerShot(_player, _player.targetFishRotation, 0);
+                                    }
                                 }
                             }
                         }
@@ -273,12 +278,12 @@ const Room = function (roomId, roomType) {
             }
         }
     };
-    that.playerShot = function (shotter, rotation, targetFishId, cb) {
+    that.playerShot = function (shotter, rotation, silver, targetFishId, cb) {
         // console.log('[room:playerShot]player shot:' + shotter.nickname + '  : rotation' + rotation);
         for(let i = 0; i < _playerList.length; i++){
             let _player = _playerList[i];
             if(_player){
-                _player.playerShot({shotter:shotter.uid, rotation:rotation, targetFishId:targetFishId, auto:_player.autoShot ? 1 : 2}, true);
+                _player.playerShot({shotter:shotter.uid, rotation:rotation, silver:silver, targetFishId:targetFishId, auto:_player.autoShot ? 1 : 2}, true);
             }
         }
     };
@@ -293,6 +298,14 @@ const Room = function (roomId, roomType) {
     };
     that.getFishList = function () {
         return _fishList;
+    };
+    that.playerSilverRefresh = function(player){
+        for(let i = 0; i < _playerList.length; i++){
+            let _player = _playerList[i];
+            if(_player){
+                _player.silverRefesh({uid:player.uid, silver:player.silver}, false);
+            }
+        }
     };
     const getPlayer = function (uid) {
         for(let i = 0; i < _playerList.length; i++){
