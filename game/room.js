@@ -151,7 +151,7 @@ const Room = function (roomId, roomType) {
                 }
                 // console.log('rom: syncGameData：' + JSON.stringify(fishData));
                 //机器人
-                if(_playerList.length < defines.roomPlayerNumberMax - 1 && getPlayerNumber() > 0){
+                if(_playerList.length < defines.roomPlayerNumberMax - 2 && getPlayerNumber() > 0){
                     if(robotCD < 0){
                         createRobot();
                         robotCD = Math.floor(Math.random() * 1000 * 5);
@@ -188,7 +188,12 @@ const Room = function (roomId, roomType) {
                     let _player = _playerList[i];
                     if(_player && _player.isRobot){
                         _player.playTime += timeStep;
+                        //没人房间加速离开
                         if(getPlayerNumber() === 0){
+                            _player.playTime +=  100 * timeStep;
+                        }
+                        //人满房间加速离开
+                        if(_playerList.length === defines.roomPlayerNumberMax && getPlayerNumber() > 0){
                             _player.playTime +=  100 * timeStep;
                         }
                         //退出
