@@ -42,6 +42,7 @@ exports.returnRobot = function (rid) {
     }
     if(logPrint) console.log('[RobotManager]归还机器人:' + robot.id + '-' + robot.nickname);
     _robotTakeOut[rid] = false;
+    console.log('现有可用机器人：' + this.getNumberOfIdle());
 };
 //机器人是否闲置状态
 exports.isRobotIdle = function (rid) {
@@ -68,4 +69,15 @@ exports.getRobotIdByRandom = function () {
     }
     copyList.length = 0;
     return -1;
+};
+//获取可用机器人个数
+exports.getNumberOfIdle = function () {
+    let count = 0;
+    for(let i = 0; i < _robotList.length; i++){
+        const robot = _robotList[i];
+        if(robot && !_robotTakeOut[robot.id]){
+            count++;
+        }
+    }
+    return count;
 };

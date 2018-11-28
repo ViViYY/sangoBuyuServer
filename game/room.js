@@ -436,10 +436,12 @@ const Room = function (roomId, roomType) {
         const rid = RobotManager.getRobotIdByRandom();
         if(-1 === rid){
             console.log('没有空闲机器人');
+            console.log('现有可用机器人：' + RobotManager.getNumberOfIdle());
             return;
         }
         if(0 === rid){
             console.log('没有去除机器人');
+            console.log('现有可用机器人：' + RobotManager.getNumberOfIdle());
             return;
         }
         const robotData = RobotManager.takeRobot(rid);
@@ -452,6 +454,7 @@ const Room = function (roomId, roomType) {
         robot.robotId = robotData.id;
         that.joinPlayer(robot);
         console.log('创建机器人：' + robot.nickname + ' seat:' + robot.seatId);
+        console.log('现有可用机器人：' + RobotManager.getNumberOfIdle());
     };
 
     const _createFish = function () {
